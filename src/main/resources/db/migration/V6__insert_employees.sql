@@ -1,0 +1,15 @@
+INSERT INTO employees (first_name, middle_name, last_name) VALUES
+('Aaron', 'Ash', 'Adams'),
+('Brandon', 'Blake', 'Brooks'),
+('Caleb', NULL, 'Carter'),
+('Dylan', 'Dean', 'Davis'),
+('Ethan', 'Eli', 'Edwards'),
+('Felix', NULL, 'Foster'),
+('Gavin', 'Gray', 'Green'),
+('Henry', 'Hugh', 'Harris'),
+('Isaac', NULL, 'Irving'),
+('Jacob', 'Jude', 'Jenkins'),
+('Kevin', 'Kyle', 'King'),
+('Liam', NULL, 'Lawson'),
+('Noah', 'Nash', 'Nelson'),
+('Owen', 'Oscar', 'Oliver');
