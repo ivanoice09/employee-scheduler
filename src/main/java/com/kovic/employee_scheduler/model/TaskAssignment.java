@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "task_assignments")
@@ -30,4 +31,7 @@ public class TaskAssignment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shift_id", nullable = false)
     private Shift shift;
+
+    @Column(name = "demo_session_id")
+    private UUID demoSessionId;
 }

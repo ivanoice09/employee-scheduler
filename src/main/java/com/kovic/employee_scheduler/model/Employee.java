@@ -7,6 +7,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "employees")
@@ -46,6 +47,10 @@ public class Employee {
 
     @Column(name = "updated_at", columnDefinition = "TIMESTAMPTZ", nullable = false)
     private OffsetDateTime updatedAt;
+
+    // future implementation
+//    @Column(name = "demo_session_id")
+//    private UUID demoSessionId;
 
     @PrePersist
     protected void onCreate() {

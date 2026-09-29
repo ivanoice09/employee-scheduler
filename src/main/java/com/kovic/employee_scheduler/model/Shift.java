@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "shifts")
@@ -34,4 +35,7 @@ public class Shift {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "week_id", nullable = false)
     private Week week;
+
+    @Column(name = "demo_session_id")
+    private UUID demoSessionId;
 }

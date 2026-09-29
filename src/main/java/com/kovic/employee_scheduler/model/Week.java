@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(
@@ -44,6 +45,9 @@ public class Week {
 
     @Column(name = "updated_at", columnDefinition = "TIMESTAMPTZ", nullable = false)
     private OffsetDateTime updatedAt;
+
+    @Column(name = "demo_session_id")
+    private UUID demoSessionId;
 
     @PrePersist
     protected void onCreate() {
