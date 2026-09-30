@@ -1,27 +1,55 @@
 package com.kovic.employee_scheduler.util;
 
+import com.kovic.employee_scheduler.model.DemoSession;
+import com.kovic.employee_scheduler.service.DemoSessionService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class DemoSessionContext {
 
-    private static final ThreadLocal<UUID> CURRENT = new ThreadLocal<>();
+    private final DemoSessionService demoSessionService;
 
-    public void set(UUID sessionId) {
-        CURRENT.set(sessionId);
-    }
-
+    /**
+     * Returns the current valid session ID for this HTTP request.
+     * Creates a new session (and cookie) if missing or expired.
+     */
     public UUID getRequired() {
-        UUID sessionId = CURRENT.get();
-        if (sessionId == null) {
-            throw new IllegalStateException("Demo session is not available");
-        }
-        return sessionId;
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(
+                RequestContextHolder.getRequestAttributes()
+        )).getRequest();
+
+        HttpServletResponse response = ((ServletRequestAttributes) Objects.requireNonNull(
+                RequestContextHolder.getRequestAttributes()
+        )).getResponse();
+
+        DemoSession demoSession = demoSessionService.getOrCreateSession(request, response);
+
+        return demoSession.getSessionId();
     }
 
-    public void clear() {
-        CURRENT.remove();
+    public long getExpiryEpochMs() {
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(
+                RequestContextHolder.getRequestAttributes()
+        )).getRequest();
+
+        HttpServletResponse response = ((ServletRequestAttributes) Objects.requireNonNull(
+                RequestContextHolder.getRequestAttributes()
+        )).getResponse();
+
+        DemoSession session = demoSessionService.getOrCreateSession(request, response);
+        return session.getCreatedAt()
+                .plus(DemoSessionService.SESSION_TTL)
+                .toInstant()
+                .toEpochMilli();
     }
+
 }
