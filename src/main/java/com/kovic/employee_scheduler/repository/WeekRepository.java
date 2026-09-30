@@ -16,5 +16,5 @@ public interface WeekRepository extends JpaRepository<Week, Long> {
             int weekNumber
     );
 
-    void deleteAllByDemoSessionId(UUID sessionId);
+    void deleteByDemoSessionId(UUID sessionId);
 }

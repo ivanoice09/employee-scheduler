@@ -23,5 +23,5 @@ public interface ShiftRepository extends JpaRepository<Shift, Long> {
             UUID demoSessionId
     );
 
-    void deleteAllByDemoSessionId(UUID sessionId);
+    void deleteByDemoSessionId(UUID sessionId);
 }
