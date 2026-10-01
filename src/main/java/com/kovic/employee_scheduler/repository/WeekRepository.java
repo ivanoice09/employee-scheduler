@@ -1,5 +1,6 @@
 package com.kovic.employee_scheduler.repository;
 
+import com.kovic.employee_scheduler.model.DemoSession;
 import com.kovic.employee_scheduler.model.Week;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,11 +11,11 @@ public interface WeekRepository extends JpaRepository<Week, Long> {
 
     // used by getWeek() from ScheduleService
     // used by saveWeek() from ScheduleService
-    Optional<Week> findByDemoSessionIdAndYearAndWeekNumber(
-            UUID demoSessionId,
+    Optional<Week> findByDemoSessionAndYearAndWeekNumber(
+            DemoSession demoSession,
             int year,
             int weekNumber
     );
 
-    void deleteByDemoSessionId(UUID sessionId);
+    void deleteByDemoSession(DemoSession demoSession);
 }

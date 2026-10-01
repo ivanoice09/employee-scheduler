@@ -40,7 +40,7 @@ public class DemoSessionService {
 
         if (session == null || isExpired(session)) {
             if (session != null) {
-                cleanupDemoData(session.getSessionId());
+                cleanupDemoData(session.getDemoSessionId());
                 demoSessionRepository.delete(session);
             }
             return createSession(response);
@@ -53,9 +53,11 @@ public class DemoSessionService {
         return OffsetDateTime.now().isAfter(session.getCreatedAt().plus(SESSION_TTL));
     }
 
-    public void cleanupDemoData(UUID sessionId) {
-        shiftRepository.deleteByDemoSessionId(sessionId);
-        weekRepository.deleteByDemoSessionId(sessionId);
+    public void cleanupDemoData(UUID demoSessionId) {
+        DemoSession demoSessionRef = demoSessionRepository.findById(demoSessionId)
+                .orElseThrow(() -> new IllegalStateException("Demo session not found"));
+        shiftRepository.deleteByDemoSession(demoSessionRef);
+        weekRepository.deleteByDemoSession(demoSessionRef);
     }
 
     public Optional<UUID> readCookie(HttpServletRequest request, String name) {
@@ -68,15 +70,15 @@ public class DemoSessionService {
     }
 
     private DemoSession createSession(HttpServletResponse response) {
-        UUID sessionId = UUID.randomUUID();
+        UUID demoSessionId = UUID.randomUUID();
 
         DemoSession session = new DemoSession();
-        session.setSessionId(sessionId);
+        session.setDemoSessionId(demoSessionId);
         session.setCreatedAt(OffsetDateTime.now());
         session.setLastActiveAt(OffsetDateTime.now());
         demoSessionRepository.save(session);
 
-        Cookie cookie = new Cookie(COOKIE_NAME, sessionId.toString());
+        Cookie cookie = new Cookie(COOKIE_NAME, demoSessionId.toString());
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(MAX_AGE_SECONDS);
