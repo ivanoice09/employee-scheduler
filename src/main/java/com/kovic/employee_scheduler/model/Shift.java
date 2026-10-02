@@ -36,6 +36,8 @@ public class Shift {
     @JoinColumn(name = "week_id", nullable = false)
     private Week week;
 
-    @Column(name = "demo_session_id")
-    private UUID demoSessionId;
+    // inside Shift Entity/Class but valid for Week and TaskAssignment too
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demo_session_id")
+    private DemoSession demoSession;
 }

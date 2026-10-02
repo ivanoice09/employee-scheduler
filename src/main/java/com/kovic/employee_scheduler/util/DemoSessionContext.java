@@ -12,6 +12,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ *  a convenience wrapper so services can get the current session ID without
+ *  needing HttpServletRequest/HttpServletResponse in their method signatures.
+ */
 @Component
 @RequiredArgsConstructor
 public class DemoSessionContext {
@@ -23,6 +27,7 @@ public class DemoSessionContext {
      * Creates a new session (and cookie) if missing or expired.
      */
     public UUID getRequired() {
+
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(
                 RequestContextHolder.getRequestAttributes()
         )).getRequest();
@@ -33,7 +38,7 @@ public class DemoSessionContext {
 
         DemoSession demoSession = demoSessionService.getOrCreateSession(request, response);
 
-        return demoSession.getSessionId();
+        return demoSession.getDemoSessionId();
     }
 
     public long getExpiryEpochMs() {

@@ -46,8 +46,9 @@ public class Week {
     @Column(name = "updated_at", columnDefinition = "TIMESTAMPTZ", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @Column(name = "demo_session_id")
-    private UUID demoSessionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demo_session_id")
+    private DemoSession demoSession;
 
     @PrePersist
     protected void onCreate() {

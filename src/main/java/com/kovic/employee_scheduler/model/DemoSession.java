@@ -15,8 +15,8 @@ import java.util.UUID;
 public class DemoSession {
 
     @Id
-    @Column(name = "session_id")
-    private UUID sessionId;
+    @Column(name = "demo_session_id")
+    private UUID demoSessionId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;

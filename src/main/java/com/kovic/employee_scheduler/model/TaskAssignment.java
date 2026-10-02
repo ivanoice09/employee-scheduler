@@ -32,6 +32,7 @@ public class TaskAssignment {
     @JoinColumn(name = "shift_id", nullable = false)
     private Shift shift;
 
-    @Column(name = "demo_session_id")
-    private UUID demoSessionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demo_session_id")
+    private DemoSession demoSession;
 }
