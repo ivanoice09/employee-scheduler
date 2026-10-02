@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public interface WeekRepository extends JpaRepository<Week, Long> {
 
-    // used by getWeek() from ScheduleService
-    // used by saveWeek() from ScheduleService
+    Week findByYearAndWeekNumber(int year, int weekNumber);
+
     Optional<Week> findByDemoSessionAndYearAndWeekNumber(
             DemoSession demoSession,
             int year,

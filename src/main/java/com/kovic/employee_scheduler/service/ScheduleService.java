@@ -35,15 +35,13 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public WeekDTO getWeek(int year, int weekNumber) {
-        UUID demoSessionId = demoSessionContext.getRequired();
-        DemoSession demoSessionRef = demoSessionRepository.findById(demoSessionId)
-                .orElseThrow(() -> new IllegalStateException("Demo session not found"));
+        Week existingWeek = weekRepository.findByYearAndWeekNumber(year, weekNumber);
 
-        return weekRepository.findByDemoSessionAndYearAndWeekNumber(
-                        demoSessionRef, year, weekNumber
-                )
-                .map(this::buildWeekScheduleDTO)
-                .orElseGet(() -> buildEmptyTemplate(year, weekNumber));
+        if (existingWeek != null) {
+            return buildWeekScheduleDTO(existingWeek);
+        }
+
+        return buildEmptyTemplate(year, weekNumber);
     }
 
     private WeekDTO buildEmptyTemplate(int year, int weekNumber) {

@@ -18,9 +18,7 @@ public class ScheduleController {
     private final DemoSessionContext demoSessionContext;
 
     @GetMapping("/{year}/{week}")
-    public WeekDTO getWeek(@PathVariable int year, @PathVariable int week, HttpServletResponse response) {
-        long expiryEpochMs = demoSessionContext.getExpiryEpochMs();
-        response.setHeader("X-Demo-Session-Expiry", String.valueOf(expiryEpochMs));
+    public WeekDTO getWeek(@PathVariable int year, @PathVariable int week) {
         return scheduleService.getWeek(year, week);
     }
 

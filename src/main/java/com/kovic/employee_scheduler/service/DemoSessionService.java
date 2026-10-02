@@ -79,7 +79,7 @@ public class DemoSessionService {
         demoSessionRepository.save(session);
 
         Cookie cookie = new Cookie(COOKIE_NAME, demoSessionId.toString());
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setPath("/");
         cookie.setMaxAge(MAX_AGE_SECONDS);
         response.addCookie(cookie);
