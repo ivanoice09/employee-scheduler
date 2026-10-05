@@ -11,4 +11,8 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, Long> {
+
+    @Modifying
+    @Query("delete from TaskAssignment ta where ta.demoSession.id = :demoSessionId")
+    void deleteByDemoSessionId(UUID demoSessionId);
 }

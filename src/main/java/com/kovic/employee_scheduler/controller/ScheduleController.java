@@ -2,11 +2,14 @@ package com.kovic.employee_scheduler.controller;
 
 import com.kovic.employee_scheduler.dto.SaveWeekDTO;
 import com.kovic.employee_scheduler.dto.WeekDTO;
+import com.kovic.employee_scheduler.helper.DemoSessionHelper;
 import com.kovic.employee_scheduler.service.ScheduleService;
-import com.kovic.employee_scheduler.util.DemoSessionContext;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/schedule")
@@ -15,16 +18,43 @@ import org.springframework.web.bind.annotation.*;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
-    private final DemoSessionContext demoSessionContext;
+    private final DemoSessionHelper demoSessionHelper;
 
     @GetMapping("/{year}/{week}")
-    public WeekDTO getWeek(@PathVariable int year, @PathVariable int week) {
-        return scheduleService.getWeek(year, week);
+    public WeekDTO getWeek(@PathVariable int year,
+                           @PathVariable int week,
+                           HttpServletRequest request,
+                           HttpServletResponse response
+    ) {
+
+        // this snippet only reads if there are any cookie
+//        UUID demoSessionId = demoSessionHelper
+//                .readCookie(request)
+//                .orElse(null);
+
+        // extract the UUID received from the backend, if it doesn't exist...
+        UUID demoSessionId = demoSessionHelper
+                .readOrCreateDemoSessionID(request, response)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Could not resolve cookie"
+                ));
+
+        return scheduleService.getWeek(year, week, demoSessionId);
     }
 
     @PostMapping("/save")
-    public void saveWeek(@RequestBody SaveWeekDTO dto) {
-        scheduleService.saveWeek(dto);
+    public void saveWeek(@RequestBody SaveWeekDTO dto,
+                         HttpServletRequest request,
+                         HttpServletResponse response
+    ) {
+        // extract the UUID received from the backend, if it doesn't exist...
+        UUID demoSessionId = demoSessionHelper
+                .readOrCreateDemoSessionID(request, response) // create it
+                .orElseThrow(() -> new IllegalStateException(
+                        "Could not resolve cookie"
+                ));
+
+        scheduleService.saveWeek(dto, demoSessionId);
     }
 
 }

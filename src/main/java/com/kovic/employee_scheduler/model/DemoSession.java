@@ -16,7 +16,7 @@ public class DemoSession {
 
     @Id
     @Column(name = "demo_session_id")
-    private UUID demoSessionId;
+    private UUID id;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;

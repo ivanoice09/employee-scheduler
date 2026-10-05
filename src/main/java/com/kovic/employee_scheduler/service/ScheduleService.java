@@ -9,7 +9,6 @@ import com.kovic.employee_scheduler.repository.DemoSessionRepository;
 import com.kovic.employee_scheduler.repository.EmployeeRepository;
 import com.kovic.employee_scheduler.repository.ShiftRepository;
 import com.kovic.employee_scheduler.repository.WeekRepository;
-import com.kovic.employee_scheduler.util.DemoSessionContext;
 import com.kovic.employee_scheduler.util.WeekUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,18 +29,16 @@ public class ScheduleService {
     private final EmployeeService employeeService;
     private final WeekRepository weekRepository;
     private final EmployeeRepository employeeRepository;
-    private final DemoSessionContext demoSessionContext;
     private final DemoSessionRepository demoSessionRepository;
 
     @Transactional(readOnly = true)
-    public WeekDTO getWeek(int year, int weekNumber) {
-        Week existingWeek = weekRepository.findByYearAndWeekNumber(year, weekNumber);
-
-        if (existingWeek != null) {
-            return buildWeekScheduleDTO(existingWeek);
-        }
-
-        return buildEmptyTemplate(year, weekNumber);
+    public WeekDTO getWeek(int year, int weekNumber, UUID demoSessionId) {
+        return weekRepository
+                // should filter week also by demo_session_id, so it selects the unique(year, weekNumber, demoSessionId)
+                .findByYearAndWeekNumberAndDemoSessionId(year, weekNumber, demoSessionId)
+                .filter(w -> demoSessionId != null) // enforce non-null demoSessionId
+                .map(week -> buildWeekScheduleDTO(week, demoSessionId))
+                .orElseGet(() -> buildEmptyTemplate(year, weekNumber));
     }
 
     private WeekDTO buildEmptyTemplate(int year, int weekNumber) {
@@ -59,15 +56,18 @@ public class ScheduleService {
         return dto;
     }
 
-    private WeekDTO buildWeekScheduleDTO(Week week) {
+    /**
+     *
+     * @param week
+     * @param demoSessionId
+     * @return
+     */
+    private WeekDTO buildWeekScheduleDTO(Week week, UUID demoSessionId) {
         List<EmployeeDTO> employees = employeeService.getAllEmployees();
 
-        UUID demoSessionId = demoSessionContext.getRequired();
-        DemoSession demoSessionRef = demoSessionRepository.findById(demoSessionId)
-                .orElseThrow(() -> new IllegalStateException("Demo session not found"));
-
+        // The returned WeekDTO has to already have the shifts associated with demoSessionId
         List<Shift> shifts = shiftRepository
-                .findByWeekIdAndDemoSession(week.getId(), demoSessionRef);
+                .findByWeekIdAndDemoSessionId(week.getId(), demoSessionId);
 
         Map<Long, List<Shift>> shiftsByEmployeeId = shifts.stream()
                 .collect(Collectors.groupingBy(shift -> shift.getEmployee().getId()));
@@ -109,17 +109,19 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void saveWeek(SaveWeekDTO dto) {
-        // finds the demoSession reference by extracting the UUID directly from the http request:
-        UUID demoSessionId = demoSessionContext.getRequired();
-        DemoSession demoSessionRef = demoSessionRepository.findById(demoSessionId)
-                .orElseThrow(() -> new IllegalStateException("Demo session not found"));
+    public void saveWeek(SaveWeekDTO dto, UUID demoSessionId) {
+
+        DemoSession demoSession = demoSessionRepository
+                .findById(demoSessionId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "YOU WROTE THIS!: Demo session not found or invalid"
+                ));
 
         Week week = weekRepository
-                .findByDemoSessionAndYearAndWeekNumber(
-                        demoSessionRef,
+                .findByYearAndWeekNumberAndDemoSessionId(
                         dto.getYear(),
-                        dto.getWeekNumber()
+                        dto.getWeekNumber(),
+                        demoSessionId
                 )
                 .orElseGet(() -> {
                     Week newWeek = new Week();
@@ -127,7 +129,7 @@ public class ScheduleService {
                     newWeek.setWeekNumber(dto.getWeekNumber());
                     newWeek.setWeekStartDate(dto.getWeekStartDate());
                     newWeek.setStatus(Week.Status.DRAFT);
-                    newWeek.setDemoSession(demoSessionRef);
+                    newWeek.setDemoSession(demoSession);
                     return weekRepository.save(newWeek);
                 });
 
@@ -141,7 +143,7 @@ public class ScheduleService {
                     ));
 
             for (ShiftDTO shiftDTO : assignmentDTO.getShifts()) {
-                saveOrUpdateAssignment(week, employee, shiftDTO, demoSessionId);
+                saveOrUpdateAssignment(week, employee, shiftDTO, demoSession);
             }
         }
     }
@@ -152,22 +154,18 @@ public class ScheduleService {
     private void saveOrUpdateAssignment(
             Week week,
             Employee employee,
-            ShiftDTO dto,
-            UUID demoSessionId
+            ShiftDTO shiftDTO,
+            DemoSession demoSession
     ) {
-
-        DemoSession demoSessionRef = demoSessionRepository.findById(demoSessionId)
-                .orElseThrow(() -> new IllegalStateException("Demo session not found"));
-
         Optional<Shift> existingShiftOpt = shiftRepository
                 .findByWeekAndEmployeeAndActualDateAndDemoSession(
                         week,
                         employee,
-                        dto.getActualDate(),
-                        demoSessionRef
+                        shiftDTO.getActualDate(),
+                        demoSession
                 );
 
-        boolean emptyShift = dto.getStartsAt() == null || dto.getEndsAt() == null;
+        boolean emptyShift = shiftDTO.getStartsAt() == null || shiftDTO.getEndsAt() == null;
 
         if (emptyShift) {
             existingShiftOpt.ifPresent(shiftRepository::delete);
@@ -176,18 +174,18 @@ public class ScheduleService {
 
         if (existingShiftOpt.isPresent()) {
             Shift existinShift = existingShiftOpt.get();
-            existinShift.setStartsAt(dto.getStartsAt());
-            existinShift.setEndsAt(dto.getEndsAt());
+            existinShift.setStartsAt(shiftDTO.getStartsAt());
+            existinShift.setEndsAt(shiftDTO.getEndsAt());
             return;
         }
 
         Shift newShift = new Shift();
-        newShift.setActualDate(dto.getActualDate());
-        newShift.setStartsAt(dto.getStartsAt());
-        newShift.setEndsAt(dto.getEndsAt());
+        newShift.setActualDate(shiftDTO.getActualDate());
+        newShift.setStartsAt(shiftDTO.getStartsAt());
+        newShift.setEndsAt(shiftDTO.getEndsAt());
         newShift.setEmployee(employee);
         newShift.setWeek(week);
-        newShift.setDemoSession(demoSessionRef);
+        newShift.setDemoSession(demoSession);
 
         shiftRepository.save(newShift);
     }

@@ -5,6 +5,8 @@ import com.kovic.employee_scheduler.model.Employee;
 import com.kovic.employee_scheduler.model.Shift;
 import com.kovic.employee_scheduler.model.Week;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,10 +15,8 @@ import java.util.UUID;
 
 public interface ShiftRepository extends JpaRepository<Shift, Long> {
 
-    // Used by buildWeekScheduleDTO() from ScheduleService
-    List<Shift> findByWeekIdAndDemoSession(Long weekId, DemoSession demoSession);
+    List<Shift> findByWeekIdAndDemoSessionId(Long weekId, UUID demoSessionId);
 
-    // Used by saveOrUpdateAssignment() from ScheduleService
     Optional<Shift> findByWeekAndEmployeeAndActualDateAndDemoSession(
             Week week,
             Employee employee,
@@ -24,5 +24,7 @@ public interface ShiftRepository extends JpaRepository<Shift, Long> {
             DemoSession demoSession
     );
 
-    void deleteByDemoSession(DemoSession demoSession);
+    @Modifying
+    @Query("delete from Shift s where s.demoSession.id = :demoSessionId")
+    void deleteByDemoSessionId(UUID demoSessionId);
 }
