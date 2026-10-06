@@ -26,15 +26,9 @@ public class ScheduleController {
                            HttpServletRequest request,
                            HttpServletResponse response
     ) {
-
-        // this snippet only reads if there are any cookie
-//        UUID demoSessionId = demoSessionHelper
-//                .readCookie(request)
-//                .orElse(null);
-
         // extract the UUID received from the backend, if it doesn't exist...
         UUID demoSessionId = demoSessionHelper
-                .readOrCreateDemoSessionID(request, response)
+                .readOrCreateDemoSessionRow(request, response) // create it
                 .orElseThrow(() -> new IllegalStateException(
                         "Could not resolve cookie"
                 ));
@@ -47,9 +41,8 @@ public class ScheduleController {
                          HttpServletRequest request,
                          HttpServletResponse response
     ) {
-        // extract the UUID received from the backend, if it doesn't exist...
         UUID demoSessionId = demoSessionHelper
-                .readOrCreateDemoSessionID(request, response) // create it
+                .readOrCreateDemoSessionRow(request, response)
                 .orElseThrow(() -> new IllegalStateException(
                         "Could not resolve cookie"
                 ));

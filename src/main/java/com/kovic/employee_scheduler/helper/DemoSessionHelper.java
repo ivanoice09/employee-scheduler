@@ -2,9 +2,6 @@ package com.kovic.employee_scheduler.helper;
 
 import com.kovic.employee_scheduler.model.DemoSession;
 import com.kovic.employee_scheduler.repository.DemoSessionRepository;
-import com.kovic.employee_scheduler.repository.ShiftRepository;
-import com.kovic.employee_scheduler.repository.WeekRepository;
-import com.kovic.employee_scheduler.util.DemoSessionUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,9 +19,6 @@ import java.util.UUID;
 public class DemoSessionHelper {
 
     private final DemoSessionRepository demoSessionRepository;
-    private final ShiftRepository shiftRepository;
-    private final WeekRepository weekRepository;
-    private final DemoSessionUtil demoSessionUtil;
 
     public static final String COOKIE_NAME = "DEMO_SESSION_ID";
     public static final int MAX_AGE_SECONDS = 180;
@@ -34,7 +28,7 @@ public class DemoSessionHelper {
      * Returns the current valid DEMO_SESSION_ID or the cookie for this request.
      * If missing or expired, creates a new one and sets it on the response.
      */
-    public Optional<UUID> readOrCreateDemoSessionID(HttpServletRequest request, HttpServletResponse response) {
+    public Optional<UUID> readOrCreateDemoSessionRow(HttpServletRequest request, HttpServletResponse response) {
 
         Optional<UUID> demoSessionId = readCookie(request);
 
@@ -43,12 +37,10 @@ public class DemoSessionHelper {
                 .orElse(null);
 
         if (demoSessionRow == null || isExpired(demoSessionRow)) {
-            if (demoSessionRow != null) {
-                demoSessionUtil.deleteExpiredSession(demoSessionRow.getId());
-            }
-
             return createDemoSessionRow(response);
         }
+
+        sendExpirationHeader(response, demoSessionRow);
 
         return demoSessionId;
     }
@@ -68,19 +60,20 @@ public class DemoSessionHelper {
 
     private Optional<UUID> createDemoSessionRow(HttpServletResponse response) {
 
-        UUID demoSessionId = UUID.randomUUID();
+        UUID newDemoSessionId = UUID.randomUUID();
 
         // saves a new row of "demo_sessions"
         DemoSession newDemoSessionRow = new DemoSession();
-        newDemoSessionRow.setId(demoSessionId);
+        newDemoSessionRow.setId(newDemoSessionId);
         newDemoSessionRow.setCreatedAt(OffsetDateTime.now());
         newDemoSessionRow.setLastActiveAt(OffsetDateTime.now()); // unused but needed in the future
         demoSessionRepository.save(newDemoSessionRow);
 
         // sets the cookie
-        setCookie(response, demoSessionId);
+        setCookie(response, newDemoSessionId);
+        sendExpirationHeader(response, newDemoSessionRow);
 
-        return Optional.of(demoSessionId);
+        return Optional.of(newDemoSessionId);
     }
 
     private void setCookie(HttpServletResponse response, UUID demoSessionId) {
@@ -90,6 +83,19 @@ public class DemoSessionHelper {
         cookie.setPath("/");
         cookie.setMaxAge(MAX_AGE_SECONDS);
         response.addCookie(cookie);
+    }
+
+    private void sendExpirationHeader(HttpServletResponse response, DemoSession demoSession) {
+        long expiresAtMillis = demoSession
+                .getCreatedAt()
+                .plusSeconds(MAX_AGE_SECONDS)
+                .toInstant()
+                .toEpochMilli();
+
+        response.setHeader(
+                "X-Demo-Session-Expires-At",
+                String.valueOf(expiresAtMillis)
+        );
     }
 
 }
