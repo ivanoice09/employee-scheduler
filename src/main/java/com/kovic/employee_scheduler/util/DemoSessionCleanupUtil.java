@@ -20,10 +20,10 @@ public class DemoSessionCleanupUtil {
      * 1 hour = 3_600_000 (actual)
      * 1 minute = 60_000 (for testing)
      */
-    @Scheduled(fixedDelay = 60_000)
+    @Scheduled(fixedDelay = 3_600_000)
     @Transactional
     public void removeExpiredSession() {
-        OffsetDateTime expirationTime = OffsetDateTime.now().minusMinutes(3);
+        OffsetDateTime expirationTime = OffsetDateTime.now().minusMinutes(30);
         demoSessionRepository.deleteByCreatedAtBefore(expirationTime);
     }
 }

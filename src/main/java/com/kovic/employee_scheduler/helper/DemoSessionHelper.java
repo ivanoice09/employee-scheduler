@@ -71,6 +71,8 @@ public class DemoSessionHelper {
 
         // sets the cookie
         setCookie(response, newDemoSessionId);
+
+        // sets the cookie's expiry on the response's headers
         sendExpirationHeader(response, newDemoSessionRow);
 
         return Optional.of(newDemoSessionId);
