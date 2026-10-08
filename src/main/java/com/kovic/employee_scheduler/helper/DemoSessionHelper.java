@@ -21,8 +21,8 @@ public class DemoSessionHelper {
     private final DemoSessionRepository demoSessionRepository;
 
     public static final String COOKIE_NAME = "DEMO_SESSION_ID";
-    public static final int MAX_AGE_SECONDS = 180;
-    public static final Duration SESSION_TTL = Duration.ofMinutes(3);
+    public static final int MAX_AGE_SECONDS = 1800;
+    public static final Duration SESSION_TTL = Duration.ofMinutes(30);
 
     /**
      * Returns the current valid DEMO_SESSION_ID or the cookie for this request.

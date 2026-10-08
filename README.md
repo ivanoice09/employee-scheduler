@@ -1,5 +1,4 @@
-# Employee Scheduler's Backend
+# Employee Scheduler Backend
 
-- See the project's full 
-documentation: [`employee-scheduler-docs`](https://github.com/ivanoice09/employee-scheduler-docs)
-- See project's frontend: [`employee-scheduler-fe`](https://github.com/ivanoice09/employee-scheduler-fe)
+- See full documentation: [`employee-scheduler-docs`](https://github.com/ivanoice09/employee-scheduler-docs)
+- See also frontend source code: [`employee-scheduler-fe`](https://github.com/ivanoice09/employee-scheduler-fe)
