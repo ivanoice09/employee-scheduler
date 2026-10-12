@@ -1,5 +1,6 @@
 package com.kovic.employee_scheduler.helper;
 
+import com.kovic.employee_scheduler.config.DemoSessionProperties;
 import com.kovic.employee_scheduler.model.DemoSession;
 import com.kovic.employee_scheduler.repository.DemoSessionRepository;
 import jakarta.servlet.http.Cookie;
@@ -19,10 +20,17 @@ import java.util.UUID;
 public class DemoSessionHelper {
 
     private final DemoSessionRepository demoSessionRepository;
+    private final DemoSessionProperties demoSessionProperties;
 
     public static final String COOKIE_NAME = "DEMO_SESSION_ID";
-    public static final int MAX_AGE_SECONDS = 1800;
-    public static final Duration SESSION_TTL = Duration.ofMinutes(30);
+
+    public Duration getSessionTtl() {
+        return demoSessionProperties.sessionTtl();
+    }
+
+    public int getMaxAgeSeconds() {
+        return demoSessionProperties.maxAgeSeconds();
+    }
 
     /**
      * Returns the current valid DEMO_SESSION_ID or the cookie for this request.
@@ -46,7 +54,7 @@ public class DemoSessionHelper {
     }
 
     public boolean isExpired(DemoSession session) {
-        return OffsetDateTime.now().isAfter(session.getCreatedAt().plus(SESSION_TTL));
+        return OffsetDateTime.now().isAfter(session.getCreatedAt().plus(getSessionTtl()));
     }
 
     public Optional<UUID> readCookie(HttpServletRequest request) {
@@ -83,14 +91,14 @@ public class DemoSessionHelper {
         cookie.setHttpOnly(true); // activates cookie handling on the browser
         cookie.setSecure(false);
         cookie.setPath("/");
-        cookie.setMaxAge(MAX_AGE_SECONDS);
+        cookie.setMaxAge(getMaxAgeSeconds());
         response.addCookie(cookie);
     }
 
     private void sendExpirationHeader(HttpServletResponse response, DemoSession demoSession) {
         long expiresAtMillis = demoSession
                 .getCreatedAt()
-                .plusSeconds(MAX_AGE_SECONDS)
+                .plusSeconds(getMaxAgeSeconds())
                 .toInstant()
                 .toEpochMilli();
 
