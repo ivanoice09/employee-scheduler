@@ -34,3 +34,8 @@ build/
 
 ### Environment Variable ###
 .env
+
+### pem files ###
+certs/
+*.pem
+*.key

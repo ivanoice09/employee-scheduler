@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -31,6 +32,9 @@ public class DemoSessionHelper {
     public int getMaxAgeSeconds() {
         return demoSessionProperties.maxAgeSeconds();
     }
+
+    @Value("${app.cookie.secure:true}")
+    private boolean cookieSecure;
 
     /**
      * Returns the current valid DEMO_SESSION_ID or the cookie for this request.
@@ -89,7 +93,7 @@ public class DemoSessionHelper {
     private void setCookie(HttpServletResponse response, UUID demoSessionId) {
         Cookie cookie = new Cookie(COOKIE_NAME, demoSessionId.toString());
         cookie.setHttpOnly(true); // activates cookie handling on the browser
-        cookie.setSecure(false);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(getMaxAgeSeconds());
         response.addCookie(cookie);

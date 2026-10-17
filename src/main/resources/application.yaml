@@ -29,6 +29,10 @@ spring:
 
 server:
   port: ${SERVER_PORT}
+  ssl:
+    enabled: true
+    certificate: file:certs/localhost.pem
+    certificate-private-key: file:certs/localhost-key.pem
 
 #jwt:
 #  secret: ${JWT_SECRET}
@@ -37,6 +41,8 @@ app:
   demo:
     session-ttl-minutes: 30
     cleanup-interval-ms: 3600000
+  cookie:
+    secure: true
 
 ---
 spring:
@@ -66,3 +72,10 @@ server:
 
 #jwt:
 #  secret: ${JWT_SECRET}
+
+app:
+  demo:
+    session-ttl-minutes: 30
+    cleanup-interval-ms: 3600000
+  cookie:
+    secure: true
