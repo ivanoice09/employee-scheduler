@@ -9,8 +9,7 @@ import java.time.Duration;
  */
 @ConfigurationProperties(prefix = "app.demo")
 public record DemoSessionProperties(
-        long sessionTtlMinutes,
-        long cleanupIntervalMs
+        long sessionTtlMinutes
 ) {
     public Duration sessionTtl() {
         return Duration.ofMinutes(sessionTtlMinutes);

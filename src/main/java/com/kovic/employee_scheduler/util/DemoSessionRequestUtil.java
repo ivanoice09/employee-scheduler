@@ -2,7 +2,6 @@ package com.kovic.employee_scheduler.util;
 
 import com.kovic.employee_scheduler.filter.DemoSessionFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 

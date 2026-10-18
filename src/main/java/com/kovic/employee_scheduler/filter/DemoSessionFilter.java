@@ -25,7 +25,6 @@ public class DemoSessionFilter extends OncePerRequestFilter {
 
     public static final String DEMO_SESSION_ID_ATTR = "DEMO_SESSION_ID";
 
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -38,5 +37,10 @@ public class DemoSessionFilter extends OncePerRequestFilter {
         demoSessionId.ifPresent(id -> request.setAttribute(DEMO_SESSION_ID_ATTR, id));
 
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "OPTIONS".equalsIgnoreCase(request.getMethod());
     }
 }
