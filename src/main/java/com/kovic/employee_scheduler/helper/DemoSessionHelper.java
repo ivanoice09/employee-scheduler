@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -91,12 +93,15 @@ public class DemoSessionHelper {
     }
 
     private void setCookie(HttpServletResponse response, UUID demoSessionId) {
-        Cookie cookie = new Cookie(COOKIE_NAME, demoSessionId.toString());
-        cookie.setHttpOnly(true); // activates cookie handling on the browser
-        cookie.setSecure(cookieSecure);
-        cookie.setPath("/");
-        cookie.setMaxAge(getMaxAgeSeconds());
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, demoSessionId.toString())
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path("/")
+                .sameSite("None")
+                .maxAge(getMaxAgeSeconds())
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     private void sendExpirationHeader(HttpServletResponse response, DemoSession demoSession) {
