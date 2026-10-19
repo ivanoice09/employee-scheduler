@@ -6,7 +6,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,16 +23,18 @@ public class DemoSessionCleanupUtil {
             cron = "${app.demo.cleanup-cron}",
             zone = "Europe/Rome"
     )
-    @ConditionalOnProperty(
-            name = "app.demo.cleanup-enabled",
-            havingValue = "true"
-    )
     @Transactional
     public void removeExpiredSession() {
+        deleteExpiredSessions();
+    }
+
+    @Transactional
+    public void deleteExpiredSessions() {
         OffsetDateTime expirationTime = OffsetDateTime.now()
                 .minus(demoSessionProperties.sessionTtl());
 
-        int deleted = demoSessionRepository.deleteByCreatedAtBefore(expirationTime);
+        int deleted = demoSessionRepository
+                .deleteByCreatedAtBefore(expirationTime);
 
         log.info("Deleted {} expired demo sessions older than {}", deleted, expirationTime);
     }

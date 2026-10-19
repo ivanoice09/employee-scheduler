@@ -6,10 +6,6 @@ spring:
 
 # this config applies both on dev and prod
 app:
-  demo:
-    session-ttl-minutes: 30
-    cleanup-enabled: false
-    cleanup-cron: "0 0 3 * * *"
   cookie:
     secure: true
 
@@ -18,11 +14,6 @@ spring:
   config:
     activate:
       on-profile: dev
-
-# override session-ttl-minutes and make it less duration on local dev
-app:
-  demo:
-    session-ttl-minutes: 5
 
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
@@ -50,6 +41,13 @@ server:
 
 #jwt:
 #  secret: ${JWT_SECRET}
+
+# override session-ttl-minutes and make it less duration on local dev
+# override cleanup scheduled on local without cron-job
+app:
+  demo:
+    session-ttl-minutes: 5
+    cleanup-cron: "0 */10 * * * *" #every 10 minutes
 
 ---
 spring:
@@ -80,3 +78,7 @@ server:
 #jwt:
 #  secret: ${JWT_SECRET}
 
+app:
+  demo:
+    session-ttl-minutes: 30
+    cleanup-cron: "-"       # disabled by default
