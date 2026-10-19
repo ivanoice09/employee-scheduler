@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface DemoSessionRepository extends JpaRepository<DemoSession, UUID> {
-    void deleteByCreatedAtBefore(OffsetDateTime cutoff);
+    int deleteByCreatedAtBefore(OffsetDateTime cutoff);
 }

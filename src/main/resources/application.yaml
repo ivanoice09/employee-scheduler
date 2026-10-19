@@ -4,11 +4,25 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:prod}
 
+# this config applies both on dev and prod
+app:
+  demo:
+    session-ttl-minutes: 30
+    cleanup-enabled: false
+    cleanup-cron: "0 0 3 * * *"
+  cookie:
+    secure: true
+
 ---
 spring:
   config:
     activate:
       on-profile: dev
+
+# override session-ttl-minutes and make it less duration on local dev
+app:
+  demo:
+    session-ttl-minutes: 5
 
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
@@ -36,13 +50,6 @@ server:
 
 #jwt:
 #  secret: ${JWT_SECRET}
-
-app:
-  demo:
-    session-ttl-minutes: 30
-    cleanup-interval-ms: 3600000
-  cookie:
-    secure: true
 
 ---
 spring:
@@ -73,9 +80,3 @@ server:
 #jwt:
 #  secret: ${JWT_SECRET}
 
-app:
-  demo:
-    session-ttl-minutes: 30
-    cleanup-interval-ms: 3600000
-  cookie:
-    secure: true
