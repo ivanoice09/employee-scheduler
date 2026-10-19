@@ -32,6 +32,11 @@ public class DemoSessionFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        System.out.println("DemoSessionFilter: "
+                + request.getMethod() + " "
+                + request.getRequestURI()
+                + " | cookie=" + demoSessionHelper.readCookie(request));
+
         Optional<UUID> demoSessionId = demoSessionHelper.readOrCreateDemoSessionRow(request, response);
 
         demoSessionId.ifPresent(id -> request.setAttribute(DEMO_SESSION_ID_ATTR, id));
