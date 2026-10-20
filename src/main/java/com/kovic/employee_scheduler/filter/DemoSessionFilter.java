@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -46,6 +47,11 @@ public class DemoSessionFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return "OPTIONS".equalsIgnoreCase(request.getMethod());
+        return "OPTIONS".equalsIgnoreCase(request.getMethod())
+        || EXCLUDED_PATHS.contains(request.getRequestURI());
     }
+
+    private static final Set<String> EXCLUDED_PATHS = Set.of(
+            "/health"
+    );
 }
