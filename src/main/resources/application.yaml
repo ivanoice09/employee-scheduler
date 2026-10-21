@@ -46,8 +46,8 @@ server:
 # override cleanup scheduled on local without cron-job
 app:
   demo:
-    session-ttl-minutes: 5
-    cleanup-cron: "0 */10 * * * *" #every 10 minutes
+    session-ttl-minutes: 15
+    cleanup-cron: "0 */30 * * * *" #every 10 minutes
 
 ---
 spring:
