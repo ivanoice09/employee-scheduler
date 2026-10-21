@@ -37,6 +37,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
+                "https://modernswiftshifter.netlify.app",
                 "https://swiftshifter.netlify.app",
                 "https://localhost:4200"
         ));
