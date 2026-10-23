@@ -10,6 +10,7 @@ import java.time.LocalTime;
  */
 @Data
 public class ShiftDTO {
+    private Long shiftId;
     private LocalDate actualDate;
     private LocalTime startsAt;
     private LocalTime endsAt;

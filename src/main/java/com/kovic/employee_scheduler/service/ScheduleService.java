@@ -102,6 +102,7 @@ public class ScheduleService {
 
     private ShiftDTO mapToShiftAssignmentDTO(Shift shift) {
         ShiftDTO dto = new ShiftDTO();
+        dto.setShiftId(shift.getId());
         dto.setActualDate(shift.getActualDate());
         dto.setStartsAt(shift.getStartsAt());
         dto.setEndsAt(shift.getEndsAt());
