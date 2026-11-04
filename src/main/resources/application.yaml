@@ -46,7 +46,7 @@ server:
 # override cleanup scheduled on local without cron-job
 app:
   demo:
-    session-ttl-minutes: 15
+    session-ttl-minutes: 5
     cleanup-cron: "0 */30 * * * *" #every 10 minutes
 
 ---
