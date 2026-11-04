@@ -47,7 +47,7 @@ server:
 app:
   demo:
     session-ttl-minutes: 5
-    cleanup-cron: "0 */30 * * * *" #every 10 minutes
+    cleanup-cron: "0 */10 * * * *" #every 10 minutes
 
 ---
 spring:
