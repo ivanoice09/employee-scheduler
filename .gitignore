@@ -34,6 +34,7 @@ build/
 
 ### Environment Variable ###
 .env
+.env.render
 
 ### pem files ###
 certs/
